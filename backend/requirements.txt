@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+pydantic-settings
+python-dotenv
+
+pandas
+numpy
+
+pulp
+ortools
+networkx
+
+pytest
+httpx
