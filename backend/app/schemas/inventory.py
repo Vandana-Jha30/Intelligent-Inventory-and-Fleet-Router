@@ -1,4 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+
+class InventoryCreate(BaseModel):
+    warehouse_id: int
+    product_id: int
+    on_hand: int
+    reserved: int = 0
+    on_order: int = 0
+
+
+class InventoryResponse(BaseModel):
+    inventory_id: int
+    warehouse_id: int
+    product_id: int
+    on_hand: int
+    reserved: int
+    on_order: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InventoryAnalysisResponse(BaseModel):

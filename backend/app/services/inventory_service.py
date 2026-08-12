@@ -7,6 +7,8 @@ from app.models.warehouse import Warehouse
 from app.models.inventory import Inventory
 from app.models.demand import DemandHistory
 
+from app.schemas.inventory import InventoryCreate
+
 from app.optimization.inventory_optimizer import (
     calculate_average_demand,
     calculate_annual_demand,
@@ -16,6 +18,84 @@ from app.optimization.inventory_optimizer import (
     calculate_reorder_point,
     calculate_inventory_position,
 )
+
+def create_inventory(
+    db: Session,
+    inventory_data: InventoryCreate
+):
+    existing_inventory = db.query(Inventory).filter(
+        Inventory.warehouse_id == inventory_data.warehouse_id,
+        Inventory.product_id == inventory_data.product_id
+    ).first()
+
+    if existing_inventory is not None:
+        raise ValueError(
+            "Inventory already exists for this product and warehouse"
+        )
+
+    inventory = Inventory(
+        warehouse_id=inventory_data.warehouse_id,
+        product_id=inventory_data.product_id,
+        on_hand=inventory_data.on_hand,
+        reserved=inventory_data.reserved,
+        on_order=inventory_data.on_order
+    )
+
+    db.add(inventory)
+    db.commit()
+    db.refresh(inventory)
+
+    return inventory
+
+
+def get_inventories(db: Session):
+    return db.query(Inventory).all()
+
+
+def get_inventory(
+    db: Session,
+    inventory_id: int
+):
+    return db.query(Inventory).filter(
+        Inventory.inventory_id == inventory_id
+    ).first()
+
+
+def update_inventory(
+    db: Session,
+    inventory_id: int,
+    inventory_data: InventoryCreate
+):
+    inventory = get_inventory(db, inventory_id)
+
+    if inventory is None:
+        return None
+
+    inventory.warehouse_id = inventory_data.warehouse_id
+    inventory.product_id = inventory_data.product_id
+    inventory.on_hand = inventory_data.on_hand
+    inventory.reserved = inventory_data.reserved
+    inventory.on_order = inventory_data.on_order
+
+    db.commit()
+    db.refresh(inventory)
+
+    return inventory
+
+
+def delete_inventory(
+    db: Session,
+    inventory_id: int
+):
+    inventory = get_inventory(db, inventory_id)
+
+    if inventory is None:
+        return False
+
+    db.delete(inventory)
+    db.commit()
+
+    return True
 
 
 def analyze_inventory(
