@@ -5,6 +5,10 @@ from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from fastapi.testclient import TestClient
+
+from app.main import app
+
 
 from app.database.database import Base
 
@@ -111,3 +115,18 @@ def demand_history(db_session, warehouse, product):
     db_session.commit()
 
     return records
+
+@pytest.fixture
+def client(db_session):
+    from app.database.database import get_db
+
+    def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    client = TestClient(app)
+
+    yield client
+
+    app.dependency_overrides.clear()

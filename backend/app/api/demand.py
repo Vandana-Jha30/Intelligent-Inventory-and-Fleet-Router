@@ -5,7 +5,8 @@ from app.database.database import get_db
 
 from app.schemas.demand import (
     DemandCreate,
-    DemandResponse
+    DemandResponse,
+    DemandForecastResponse
 )
 
 from app.services.demand_service import (
@@ -13,6 +14,10 @@ from app.services.demand_service import (
     get_demands,
     get_demand,
     delete_demand
+)
+
+from app.optimization.demand_forecaster import (
+    moving_average_forecast
 )
 
 
@@ -62,6 +67,46 @@ def get_one(
     return demand
 
 
+@router.get(
+    "/forecast/{product_id}/{warehouse_id}",
+    response_model=DemandForecastResponse
+)
+def forecast(
+    product_id: int,
+    warehouse_id: int,
+    window: int = 3,
+    db: Session = Depends(get_db)
+):
+    demands = get_demands(db)
+
+    filtered_demands = [
+        demand.quantity
+        for demand in demands
+        if demand.product_id == product_id
+        and demand.warehouse_id == warehouse_id
+    ]
+
+    try:
+        forecast_value = moving_average_forecast(
+            filtered_demands,
+            window
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+    return {
+        "product_id": product_id,
+        "warehouse_id": warehouse_id,
+        "method": "moving_average",
+        "window": window,
+        "forecast": forecast_value
+    }
+
+
 @router.delete("/{demand_id}")
 def delete(
     demand_id: int,
@@ -81,3 +126,4 @@ def delete(
     return {
         "message": "Demand record deleted successfully"
     }
+
