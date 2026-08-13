@@ -196,8 +196,13 @@ def analyze_inventory(
 
     # 11. Replenishment decision
     replenishment_required = (
-        inventory_position <= reorder_point
+    inventory_position <= reorder_point
     )
+
+    if replenishment_required:
+        recommended_order_quantity = eoq
+    else:
+        recommended_order_quantity = 0
 
     return {
         "product_id": product_id,
@@ -216,5 +221,6 @@ def analyze_inventory(
         "on_order": inventory.on_order,
         "inventory_position": inventory_position,
 
-        "replenishment_required": replenishment_required
+        "replenishment_required": replenishment_required,
+        "recommended_order_quantity": recommended_order_quantity
     }

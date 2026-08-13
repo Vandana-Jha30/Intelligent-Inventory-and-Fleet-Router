@@ -38,3 +38,4 @@ class InventoryAnalysisResponse(BaseModel):
     inventory_position: int
 
     replenishment_required: bool
+    recommended_order_quantity: float

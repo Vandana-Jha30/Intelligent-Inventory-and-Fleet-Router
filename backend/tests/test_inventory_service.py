@@ -26,6 +26,7 @@ def test_inventory_analysis(
     assert result["inventory_position"] == 650
 
     assert result["replenishment_required"] is False
+    assert result["recommended_order_quantity"] == 0
 
 
 def test_missing_inventory(
@@ -60,3 +61,34 @@ def test_insufficient_demand_history(
             product_id=product.product_id,
             warehouse_id=warehouse.warehouse_id
         )
+
+
+def test_replenishment_required(
+    db_session,
+    product,
+    warehouse,
+    demand_history
+):
+    from app.models.inventory import Inventory
+
+    inventory = Inventory(
+        warehouse_id=warehouse.warehouse_id,
+        product_id=product.product_id,
+        on_hand=200,
+        reserved=100,
+        on_order=100
+    )
+
+    db_session.add(inventory)
+    db_session.commit()
+
+    result = analyze_inventory(
+        db_session,
+        product_id=product.product_id,
+        warehouse_id=warehouse.warehouse_id
+    )
+
+    assert result["inventory_position"] == 200
+    assert result["replenishment_required"] is True
+
+    assert result["recommended_order_quantity"] == result["eoq"]
