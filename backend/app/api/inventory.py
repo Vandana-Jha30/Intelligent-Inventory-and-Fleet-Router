@@ -6,7 +6,8 @@ from app.database.database import get_db
 from app.schemas.inventory import (
     InventoryCreate,
     InventoryResponse,
-    InventoryAnalysisResponse
+    InventoryAnalysisResponse,
+    InventoryForecastAnalysisResponse
 )
 
 from app.services.inventory_service import (
@@ -15,7 +16,8 @@ from app.services.inventory_service import (
     get_inventory,
     update_inventory,
     delete_inventory,
-    analyze_inventory
+    analyze_inventory,
+    analyze_inventory_with_forecast
 )
 
 
@@ -58,6 +60,31 @@ def get_all(
 
 
 @router.get(
+    "/forecast-analysis/{product_id}/{warehouse_id}",
+    response_model=InventoryForecastAnalysisResponse
+)
+def analyze_with_forecast(
+    product_id: int,
+    warehouse_id: int,
+    window: int = 3,
+    db: Session = Depends(get_db)
+):
+    try:
+        return analyze_inventory_with_forecast(
+            db=db,
+            product_id=product_id,
+            warehouse_id=warehouse_id,
+            window=window
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+
+@router.get(
     "/{inventory_id}",
     response_model=InventoryResponse
 )
@@ -88,19 +115,26 @@ def update(
     inventory_data: InventoryCreate,
     db: Session = Depends(get_db)
 ):
-    inventory = update_inventory(
-        db,
-        inventory_id,
-        inventory_data
-    )
-
-    if inventory is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Inventory record not found"
+    try:
+        inventory = update_inventory(
+            db,
+            inventory_id,
+            inventory_data
         )
 
-    return inventory
+        if inventory is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Inventory record not found"
+            )
+
+        return inventory
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=409,
+            detail=str(error)
+        )
 
 
 @router.delete("/{inventory_id}")

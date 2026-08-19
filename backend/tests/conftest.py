@@ -3,6 +3,7 @@ import pytest
 from datetime import date
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
 from fastapi.testclient import TestClient
@@ -21,8 +22,9 @@ from app.models.demand import DemandHistory
 @pytest.fixture
 def db_session():
     engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False}
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool
     )
 
     Base.metadata.create_all(bind=engine)

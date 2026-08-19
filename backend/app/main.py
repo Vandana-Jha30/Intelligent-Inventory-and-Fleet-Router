@@ -9,6 +9,12 @@ from app.models.demand import DemandHistory
 from app.api.products import router as product_router
 from app.api.demand import router as demand_router
 from app.api.inventory import router as inventory_router
+from app.models.vehicle import Vehicle
+from app.api.vehicles import router as vehicle_router
+from app.models.delivery_location import DeliveryLocation
+from app.api.delivery_locations import router as delivery_location_router
+from app.models.depot import Depot
+from app.api.depots import router as depot_router
 
 
 Base.metadata.create_all(bind=engine)
@@ -25,6 +31,9 @@ app.include_router(warehouse_router)
 app.include_router(product_router)
 app.include_router(demand_router)
 app.include_router(inventory_router)
+app.include_router(vehicle_router)
+app.include_router(delivery_location_router)
+app.include_router(depot_router)
 
 
 @app.get("/")
