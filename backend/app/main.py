@@ -15,7 +15,10 @@ from app.models.delivery_location import DeliveryLocation
 from app.api.delivery_locations import router as delivery_location_router
 from app.models.depot import Depot
 from app.api.depots import router as depot_router
-
+from app.api.vehicle_routing import (
+    router as vehicle_routing_router
+)
+from app.api.supply_chain import router as supply_chain_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -34,6 +37,8 @@ app.include_router(inventory_router)
 app.include_router(vehicle_router)
 app.include_router(delivery_location_router)
 app.include_router(depot_router)
+app.include_router(vehicle_routing_router)
+app.include_router(supply_chain_router)
 
 
 @app.get("/")
