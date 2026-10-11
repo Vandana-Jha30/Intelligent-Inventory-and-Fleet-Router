@@ -17,6 +17,7 @@ from app.models.warehouse import Warehouse
 from app.models.product import Product
 from app.models.inventory import Inventory
 from app.models.demand import DemandHistory
+from app.models.delivery_location import DeliveryLocation
 
 
 @pytest.fixture
@@ -121,6 +122,27 @@ def demand_history(db_session, warehouse, product):
 @pytest.fixture
 def client(db_session):
     from app.database.database import get_db
+
+    warehouse = Warehouse(
+        warehouse_id=1,
+        name="Test Warehouse",
+        latitude=12.9716,
+        longitude=77.5946,
+        capacity=5000,
+        operating_cost=25000
+    )
+
+    # delivery_location = DeliveryLocation(
+    #     location_id=1,
+    #     location_name="Test Customer",
+    #     latitude=12.9750,
+    #     longitude=77.6000,
+    #     demand_quantity=100
+    # )
+
+    db_session.add(warehouse)
+    # db_session.add(delivery_location)
+    db_session.commit()
 
     def override_get_db():
         yield db_session

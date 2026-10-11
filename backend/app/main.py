@@ -19,6 +19,13 @@ from app.api.vehicle_routing import (
     router as vehicle_routing_router
 )
 from app.api.supply_chain import router as supply_chain_router
+from app.api.transportation import (
+    router as transportation_router
+)
+from app.api.facility_location import (
+    router as facility_location_router
+)
+from app.api.min_cost_flow import router as min_cost_flow_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -39,6 +46,9 @@ app.include_router(delivery_location_router)
 app.include_router(depot_router)
 app.include_router(vehicle_routing_router)
 app.include_router(supply_chain_router)
+app.include_router(transportation_router)
+app.include_router(facility_location_router)
+app.include_router(min_cost_flow_router)
 
 
 @app.get("/")

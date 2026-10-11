@@ -11,7 +11,7 @@ def test_update_inventory_duplicate_returns_conflict(client):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     warehouse_1 = response.json()
 
     # 2. Create second warehouse
@@ -26,7 +26,7 @@ def test_update_inventory_duplicate_returns_conflict(client):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     warehouse_2 = response.json()
 
     # 3. Create product

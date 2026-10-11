@@ -23,7 +23,8 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=WarehouseResponse
+    response_model=WarehouseResponse,
+    status_code=201
 )
 def create(
     warehouse_data: WarehouseCreate,

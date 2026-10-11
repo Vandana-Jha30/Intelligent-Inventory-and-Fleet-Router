@@ -25,4 +25,4 @@ class DemandForecastResponse(BaseModel):
     warehouse_id: int
     method: str
     window: int
-    forecast: float
+    forecast: float 
